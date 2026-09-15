@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=video/*;
+Actions=converterAudioMp3;converterAudioWav;
+X-KDE-Submenu=Converter Áudio
+X-KDE-Priority=TopLevel
+
+[Desktop Action converterAudioMp3]
+Name=Converter para MP3
+Icon=new-audio-alarm
+Exec=~/.local/bin/converter-audio mp3 %F
+
+[Desktop Action converterAudioWav]
+Name=Converter para WAV (Lossless)
+Icon=new-audio-alarm
+Exec=~/.local/bin/converter-audio wav %F
