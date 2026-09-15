@@ -1,29 +1,28 @@
-cat << 'EOF' > ~/.local/share/kio/servicemenus/convert_audio.desktop
 [Desktop Entry]
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=video/*;
-Actions=extractMp3;extractWav;embedMp3;embedPcm;
-X-KDE-Submenu=Converter Áudio
+Actions=Icone;extractMp3;extractWav;embedMp3;embedPcm;
+X-KDE-Submenu=Converter/Extrair Áudio
+Icon=new-audio-alarm
 X-KDE-Priority=TopLevel
 
 [Desktop Action extractMp3]
 Name=Extrair apenas Áudio (MP3)
-Icon=audio-mp3
-Exec=~/.local/bin/ffmpeg-audio-kdialog extract-mp3 %F
+Icon=new-audio-alarm
+Exec=~/.local/bin/converter-audio extract-mp3 %F
 
 [Desktop Action extractWav]
 Name=Extrair apenas Áudio (WAV Lossless)
 Icon=audio-x-wav
-Exec=~/.local/bin/ffmpeg-audio-kdialog extract-wav %F
+Exec=~/.local/bin/converter-audio extract-wav %F
 
 [Desktop Action embedMp3]
-Name=Substituir Áudio do Vídeo por MP3
-Icon=video-mlt-playlist
-Exec=~/.local/bin/ffmpeg-audio-kdialog embed-mp3 %F
+Name=Converter Áudio do Vídeo para MP3
+Icon=folder-videos-symbolic
+Exec=~/.local/bin/converter-audio embed-mp3 %F
 
 [Desktop Action embedPcm]
-Name=Substituir Áudio do Vídeo por PCM/WAV
-Icon=video-x-wmv
-Exec=~/.local/bin/ffmpeg-audio-kdialog embed-pcm %F
-EOF
+Name=Converter Áudio do Vídeo para PCM
+Icon=video-mp4
+Exec=~/.local/bin/converter-audio embed-pcm %F
