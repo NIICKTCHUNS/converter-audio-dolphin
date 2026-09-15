@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-format="$1"
+mode="$1"
 shift
 
 for f in "$@"; do
+    [ -f "$f" ] || continue
+
     # Obter duração total do vídeo
     duration=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$f")
     total_sec=${duration%.*}
@@ -12,20 +14,46 @@ for f in "$@"; do
         total_sec=1
     fi
 
-    # Configurar parâmetros do ffmpeg por formato
-    if [ "$format" = "mp3" ]; then
-        ffmpeg_opts=(-q:a 0 -map a)
-        label="MP3"
-    else
-        ffmpeg_opts=(-vn -c:a pcm_s16le)
-        label="WAV Lossless"
-    fi
+    base=$(basename "$f")
+    filename_noext="${f%.*}"
+    ext="${f##*.}"
+    is_replace=0
 
-    # Abrir a janela de progresso
-    dbusRef=$(kdialog --title "Conversor de Áudio" --progressbar "Extraindo $label de:\n$(basename "$f")" 100)
+    case "$mode" in
+        "extract-mp3")
+            output="${filename_noext}.mp3"
+            ffmpeg_args=(-i "$f" -vn -c:a libmp3lame -q:a 0 -y)
+            label="Extraindo MP3 de:\n$base"
+            ;;
+        "extract-wav")
+            output="${filename_noext}.wav"
+            ffmpeg_args=(-i "$f" -vn -c:a pcm_s16le -y)
+            label="Extraindo WAV Lossless de:\n$base"
+            ;;
+        "embed-mp3")
+            tmp_out="${filename_noext}_tmp_audio.${ext}"
+            output="$tmp_out"
+            ffmpeg_args=(-i "$f" -c:v copy -c:a libmp3lame -q:a 0 -y)
+            label="Convertendo áudio interno para MP3 em:\n$base"
+            is_replace=1
+            ;;
+        "embed-pcm")
+            tmp_out="${filename_noext}_tmp_audio.${ext}"
+            output="$tmp_out"
+            ffmpeg_args=(-i "$f" -c:v copy -c:a pcm_s16le -y)
+            label="Convertendo áudio interno para PCM em:\n$base"
+            is_replace=1
+            ;;
+        *)
+            exit 1
+            ;;
+    esac
 
-    # Executar o ffmpeg e atualizar a barra
-    ffmpeg -i "$f" "${ffmpeg_opts[@]}" -y -progress pipe:1 "${f%.*}.${format}" 2>/dev/null | while read -r line; do
+    # Criar a barra de progresso no Kdialog
+    dbusRef=$(kdialog --title "Conversor de Áudio" --progressbar "$label" 100)
+
+    # Executar o ffmpeg monitorando o progresso via D-Bus
+    ffmpeg "${ffmpeg_args[@]}" -progress pipe:1 "$output" 2>/dev/null | while read -r line; do
         if [[ "$line" =~ out_time_ms=([0-9]+) ]]; then
             us="${BASH_REMATCH[1]}"
             cur_sec=$((us / 1000000))
@@ -36,4 +64,14 @@ for f in "$@"; do
     done
 
     qdbus $dbusRef close 2>/dev/null
+
+    # Se for modo de substituição, faz o swap seguro do arquivo
+    if [ "$is_replace" -eq 1 ]; then
+        if [ -f "$tmp_out" ] && [ -s "$tmp_out" ]; then
+            mv -f "$tmp_out" "$f"
+        else
+            rm -f "$tmp_out"
+            kdialog --error "Ocorreu um erro ao converter o áudio no vídeo:\n$base"
+        fi
+    fi
 done

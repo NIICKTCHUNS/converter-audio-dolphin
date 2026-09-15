@@ -1,17 +1,29 @@
+cat << 'EOF' > ~/.local/share/kio/servicemenus/convert_audio.desktop
 [Desktop Entry]
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=video/*;
-Actions=converterAudioMp3;converterAudioWav;
+Actions=extractMp3;extractWav;embedMp3;embedPcm;
 X-KDE-Submenu=Converter Áudio
 X-KDE-Priority=TopLevel
 
-[Desktop Action converterAudioMp3]
-Name=Converter para MP3
-Icon=new-audio-alarm
-Exec=~/.local/bin/converter-audio mp3 %F
+[Desktop Action extractMp3]
+Name=Extrair apenas Áudio (MP3)
+Icon=audio-mp3
+Exec=~/.local/bin/ffmpeg-audio-kdialog extract-mp3 %F
 
-[Desktop Action converterAudioWav]
-Name=Converter para WAV (Lossless)
-Icon=new-audio-alarm
-Exec=~/.local/bin/converter-audio wav %F
+[Desktop Action extractWav]
+Name=Extrair apenas Áudio (WAV Lossless)
+Icon=audio-x-wav
+Exec=~/.local/bin/ffmpeg-audio-kdialog extract-wav %F
+
+[Desktop Action embedMp3]
+Name=Substituir Áudio do Vídeo por MP3
+Icon=video-mlt-playlist
+Exec=~/.local/bin/ffmpeg-audio-kdialog embed-mp3 %F
+
+[Desktop Action embedPcm]
+Name=Substituir Áudio do Vídeo por PCM/WAV
+Icon=video-x-wmv
+Exec=~/.local/bin/ffmpeg-audio-kdialog embed-pcm %F
+EOF
