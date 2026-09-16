@@ -7,3 +7,6 @@
  - Após isso, copie ou mova o outro arquivo `converter-audio` (sem extensão de arquivo) para esse local: `.local/bin/` da sua home
 
  Só de fazer isso, ele já vai estar instalado, se quiser desinstalar, é só apagar esses arquivos. Se você quiser ocultar posteriormente, só ir nas configurações do Dolphin > Menu de Contexto. Ali você encontra todas as opções dos menus de contexto do Dolphin, inclusive desse plugin.
+
+### Aviso
+Usei o Gemini para fazer esse projeto, se você não curte a ideia de projetos gerados por IA fique a vontade para ignorar esse projeto.
